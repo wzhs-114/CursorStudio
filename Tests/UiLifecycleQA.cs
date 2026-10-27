@@ -1,0 +1,19 @@
+using System;
+using System.IO;
+using System.Linq;
+using System.Drawing;
+using System.Diagnostics;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using System.Windows.Forms;
+using CursorStudio;
+class UiLifecycleQA {
+ [DllImport("psapi.dll",SetLastError=true)]static extern bool QueryWorkingSet(IntPtr process,IntPtr data,int length);
+ [DllImport("user32.dll")]static extern uint GetGuiResources(IntPtr process,uint flags);
+ static object Memory(string phase){using(var p=Process.GetCurrentProcess()){long privateWorking=0;IntPtr data=Marshal.AllocHGlobal(2*1024*1024);try{if(QueryWorkingSet(p.Handle,data,2*1024*1024)){long count=Marshal.ReadIntPtr(data).ToInt64();for(int i=1;i<=count;i++)if((Marshal.ReadIntPtr(data,i*IntPtr.Size).ToInt64()&256)==0)privateWorking+=Environment.SystemPageSize;}}finally{Marshal.FreeHGlobal(data);}p.Refresh();return new{phase,workingSetMiB=p.WorkingSet64/1048576.0,privateBytesMiB=p.PrivateMemorySize64/1048576.0,privateWorkingSetMiB=privateWorking/1048576.0,handles=p.HandleCount,gdi=GetGuiResources(p.Handle,0),user=GetGuiResources(p.Handle,1)};}}
+ static void Require(bool value,string text){if(!value)throw new Exception(text);}
+ [STAThread]static int Main(string[] args){if(args.Length==3&&args[0]=="--startup-state")return StartupRegistration.Worker(args[1],args[2]);Application.EnableVisualStyles();Application.SetCompatibleTextRenderingDefault(false);string real=Store.Root;Store.Root=Path.Combine(Path.GetTempPath(),"CursorStudio-UiQA-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(Store.Library);var records=new List<object>();var result=new Dictionary<string,object>();int code=1;
+  var theme=new Theme{Name="Lifecycle sample",Pixels=Native.DesktopSize(),Files=Native.CurrentPaths()};var settings=new Settings{Initialized=true,ActiveId=theme.Id};settings.Themes.Add(theme);
+  try{using(var form=new MainForm(settings,true)){form.StartPosition=FormStartPosition.Manual;form.Location=new Point(-20000,-20000);Require(!form.UiReady&&!form.Visible,"Silent startup created UI");form.BeginInvoke((Action)(async()=>{try{await System.Threading.Tasks.Task.Delay(300);records.Add(Memory("cold-hidden"));for(int i=0;i<12;i++){form.ShowMain();await System.Threading.Tasks.Task.Delay(100);Require(form.UiReady&&form.Visible,"Open incomplete cycle="+i+" visible="+form.Visible+" ready="+form.UiReady+" state="+form.WindowState);var presenting=typeof(MainForm).GetField("presenting",System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Instance);if(presenting!=null)Require(!(bool)presenting.GetValue(form),"Presentation buffer still retained");form.WindowState=FormWindowState.Minimized;await System.Threading.Tasks.Task.Delay(100);Require(!form.UiReady,"Minimize retained UI");form.ShowMain();Require(form.UiReady,"Restore incomplete");form.Hide();await System.Threading.Tasks.Task.Delay(100);Require(!form.UiReady,"Hide retained UI cycle="+i+" visible="+form.Visible+" ready="+form.UiReady+" state="+form.WindowState);if(i==5||i==11)records.Add(Memory("hidden-cycle-"+(i+1)));}await System.Threading.Tasks.Task.Delay(500);records.Add(Memory("hidden-settled"));using(var p=Process.GetCurrentProcess()){TimeSpan cpu=p.TotalProcessorTime;await System.Threading.Tasks.Task.Delay(10000);p.Refresh();result["hiddenCpuMs"]=(p.TotalProcessorTime-cpu).TotalMilliseconds;}records.Add(Memory("hidden-idle"));result["success"]=true;code=0;}catch(Exception e){result["error"]=e.ToString();result["success"]=false;}finally{form.ExitNow();}}));Application.Run(form);}}finally{Store.Root=real;result["samples"]=records;File.WriteAllText(args[0],Store.Json.Serialize(result));}return code;
+ }
+}

@@ -1,0 +1,2 @@
+using System;using System.Drawing;using System.Windows.Forms;
+class RuleTestHost{[STAThread]static void Main(){Application.EnableVisualStyles();var f=new Form{Text="Cursor Studio · 应用规则验证窗口",Size=new Size(520,250),StartPosition=FormStartPosition.CenterScreen,Font=new Font("Microsoft YaHei UI",12)};f.Controls.Add(new Label{Text="此测试程序在前台时：32 像素\n切回管理器时：恢复桌面 96 像素",Dock=DockStyle.Fill,TextAlign=ContentAlignment.MiddleCenter});var b=new Button{Text="关闭验证窗口",Dock=DockStyle.Bottom,Height=50};b.Click+=delegate{f.Close();};f.Controls.Add(b);Application.Run(f);}}

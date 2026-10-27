@@ -1,0 +1,13 @@
+/dist/
+/Tests/*
+!/Tests/RuleTestHost.cs
+!/Tests/StartupRegistrationQA.cs
+!/Tests/UiLifecycleQA.cs
+!/Tests/Test.ps1
+/Source/*.exe
+/Source/*.pdb
+*.user
+*.suo
+.vs/
+__pycache__/
+*.pyc

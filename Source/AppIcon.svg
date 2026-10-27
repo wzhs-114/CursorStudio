@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Original geometric pointer, centered on a transparent canvas. MIT. -->
+  <polygon points="14,7 14,48 25,37 35,57 43,53 33,34 50,34"
+           fill="white" stroke="#111111" stroke-width="1.8" stroke-linejoin="round" />
+</svg>
