@@ -1,0 +1,46 @@
+name: Publish release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Validate version and notes
+        shell: pwsh
+        run: |
+          if ($env:GITHUB_REF_NAME -notmatch '^v(\d+\.\d+\.\d+)$') { throw 'Expected vMAJOR.MINOR.PATCH' }
+          $version = $Matches[1]
+          if (-not (Test-Path "Releases/$version.md")) { throw 'Release notes missing' }
+          "RELEASE_VERSION=$version" >> $env:GITHUB_ENV
+      - name: Build and run isolated self-test
+        shell: pwsh
+        run: |
+          ./Tests/Test.ps1
+          $actual = (Get-Item dist/CursorStudio/CursorStudio.exe).VersionInfo.FileVersion
+          if ($actual -ne "$env:RELEASE_VERSION.0") { throw "Version mismatch: $actual" }
+      - name: Package public files
+        shell: pwsh
+        run: ./Tools/Package.ps1 -Version $env:RELEASE_VERSION
+      - name: Publish new release with Windows ZIP
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh release create $env:GITHUB_REF_NAME "dist/CursorStudio-$env:RELEASE_VERSION-Windows11.zip" --verify-tag --title "Cursor Studio $env:RELEASE_VERSION" --notes-file "Releases/$env:RELEASE_VERSION.md" --latest
+          if ($LASTEXITCODE -ne 0) { throw 'Release creation failed; existing releases were not replaced' }
