@@ -18,7 +18,7 @@ Cursor Studio **1.0.0** is a free, MIT-licensed **Windows 11 cursor manager** fo
 
 ### Download and use
 
-Download the Windows ZIP from [Releases](https://github.com/wzhs-114/CursorStudio/releases), extract the entire archive, and run `CursorStudio.exe`. Administrator privileges are not required. The application UI is currently primarily Chinese; this English text documents its use and does not add an English UI.
+Download the Windows ZIP from [Releases](https://github.com/wzhs-114/CursorStudio/releases), extract the entire archive, and run `CursorStudio.exe`. Administrator privileges are not required. The application defaults to English. Use the Interface language selector at the top right to switch between English and Simplified Chinese; your choice is saved.
 
 Use “导入当前系统指针” (Import current system cursors) to copy the configured cursor files into an independent theme, including ANI animations and the desktop size, without switching the current scheme. This captures Windows system cursor files, not game-rendered pointers.
 
@@ -137,7 +137,7 @@ Windows 11 鼠标指针主题与应用大小管理器。管理多套 CUR/ANI 指
 - 仅控制 Windows 系统指针。游戏自行绘制的光标、准星或主动覆盖系统设置的行为不保证能控制。
 - 不向游戏注入 DLL，不修改游戏文件，没有独立光标叠加渲染层；这也限制了可覆盖的游戏类型，不构成所有游戏的兼容性承诺。
 - Windows 设置页直接调大小仍可能覆盖自定义主题，建议使用本程序的滑条或“重新应用”。
-- 当前界面主要为中文；不同显示器混合 DPI、不同 Windows 更新和特殊游戏环境需要更多反馈。
+- 界面默认英文，可在右上角“Interface language / 界面语言”切换简体中文并自动保存；不同显示器混合 DPI、不同 Windows 更新和特殊游戏环境需要更多反馈。
 
 ### 许可证与素材
 

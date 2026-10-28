@@ -52,7 +52,7 @@ public class FluentButton:Button {
 public sealed class StepSlider:Control {
  int value=1;bool dragging;public int Minimum=1,Maximum=15,TickFrequency=1,LargeChange=1;public event EventHandler ValueChanged;
  public int Value {get{return value;}set{int next=Math.Max(Minimum,Math.Min(Maximum,value));if(next==this.value)return;this.value=next;Invalidate();if(ValueChanged!=null)ValueChanged(this,EventArgs.Empty);}}
- public StepSlider(){SetStyle(ControlStyles.UserPaint|ControlStyles.AllPaintingInWmPaint|ControlStyles.OptimizedDoubleBuffer|ControlStyles.ResizeRedraw|ControlStyles.Selectable,true);Height=48;TabStop=true;AccessibleRole=AccessibleRole.Slider;AccessibleName="指针大小档位";}
+ public StepSlider(){SetStyle(ControlStyles.UserPaint|ControlStyles.AllPaintingInWmPaint|ControlStyles.OptimizedDoubleBuffer|ControlStyles.ResizeRedraw|ControlStyles.Selectable,true);Height=48;TabStop=true;AccessibleRole=AccessibleRole.Slider;AccessibleName=L.T("指针大小档位");}
  void PointValue(int x){float margin=12*DeviceDpi/96f;Value=Minimum+(int)Math.Round((x-margin)/Math.Max(1,Width-2*margin)*(Maximum-Minimum));}
  protected override void OnMouseDown(MouseEventArgs e){base.OnMouseDown(e);if(e.Button!=MouseButtons.Left)return;Focus();dragging=true;Capture=true;PointValue(e.X);}
  protected override void OnMouseMove(MouseEventArgs e){base.OnMouseMove(e);if(dragging)PointValue(e.X);}

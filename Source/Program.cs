@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
 using System.Reflection;
-[assembly:AssemblyTitle("Cursor Studio 鼠标指针管理器")]
+[assembly:AssemblyTitle("Cursor Studio Cursor Manager")]
 [assembly:AssemblyVersion("1.0.0.0")]
 [assembly:AssemblyFileVersion("1.0.0.0")]
 namespace CursorStudio {
@@ -18,7 +18,7 @@ static class Program {
  if(args.Contains("--resource-test"))return Tests.Resources(args.Length>1?args[1]:Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"resource-test.json"));
  if(args.Length==2&&args[0]=="--startup-status"){Store.Atomic(args[1],Store.Json.Serialize(StartupRegistration.Run("status")));return 0;}
  ShowEvent=new EventWaitHandle(false,EventResetMode.AutoReset,@"Local\CursorStudio.Show.v1");QuitEvent=new EventWaitHandle(false,EventResetMode.AutoReset,@"Local\CursorStudio.Quit.v1");RestoreEvent=new EventWaitHandle(false,EventResetMode.AutoReset,@"Local\CursorStudio.Restore.v1");if(args.Contains("--quit")){QuitEvent.Set();return 0;}
- bool created;using(var mutex=new Mutex(true,@"Local\CursorStudio.Instance.v1",out created)){if(!created){if(args.Contains("--restore"))RestoreEvent.Set();else if(!args.Contains("--startup"))ShowEvent.Set();return 0;}try{Settings s=Store.Load();Initialize(s);
+ bool created;using(var mutex=new Mutex(true,@"Local\CursorStudio.Instance.v1",out created)){if(!created){if(args.Contains("--restore"))RestoreEvent.Set();else if(!args.Contains("--startup"))ShowEvent.Set();return 0;}try{Settings s=Store.Load();L.Set(s.Language);Initialize(s);
  if(args.Contains("--migrate-endfield")){Migration.Run(s);return 0;}
  if(args.Contains("--refresh-startup")){Store.Startup(s.AutoStart);return 0;}
  if(args.Contains("--restore")){Backup.Original();s.ActiveId="";s.RulesEnabled=false;Store.Save(s);return 0;}
