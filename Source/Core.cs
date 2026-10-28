@@ -26,6 +26,7 @@ public sealed class Settings {
  public string Appearance="Performance";
  public bool CloseToTray=true;
  public string Language="en";
+ public int UiPage,UiRole,UiBackground;
 }
 public sealed class RegValue {public string Name;public int Kind;public object Value;}
 public sealed class Snapshot {
@@ -39,8 +40,12 @@ public static class Store {
  public static string Config {get{return Path.Combine(Root,"settings.json");}}
  public static string Library {get{return Path.Combine(Root,"Library");}}
  public static readonly JavaScriptSerializer Json=new JavaScriptSerializer{MaxJsonLength=16000000};
- public static Settings Load(){Directory.CreateDirectory(Library);if(!File.Exists(Config))return new Settings();var s=Json.Deserialize<Settings>(File.ReadAllText(Config));if(s==null)throw new Exception(L.T("主题库配置损坏，未覆盖原文件。请查看备份 settings.json.bak。"));return s;}
- public static void Save(Settings s){Atomic(Config,Json.Serialize(s));}
+ sealed class Baseline {public Dictionary<string,string> Fields;}
+ static readonly System.Runtime.CompilerServices.ConditionalWeakTable<Settings,Baseline> baselines=new System.Runtime.CompilerServices.ConditionalWeakTable<Settings,Baseline>();
+ static Dictionary<string,string> Fields(Settings s){return typeof(Settings).GetFields().ToDictionary(f=>f.Name,f=>Json.Serialize(f.GetValue(s)));}
+ public static void Refresh(Settings target,Settings fresh){var current=Fields(target);var incoming=Fields(fresh);foreach(var field in typeof(Settings).GetFields())if(current[field.Name]!=incoming[field.Name])field.SetValue(target,field.GetValue(fresh));baselines.Remove(target);baselines.Add(target,new Baseline{Fields=Fields(target)});}
+ public static Settings Load(){Directory.CreateDirectory(Library);var s=File.Exists(Config)?Json.Deserialize<Settings>(File.ReadAllText(Config)):new Settings();if(s==null)throw new Exception(L.T("主题库配置损坏，未覆盖原文件。请查看备份 settings.json.bak。"));baselines.Add(s,new Baseline{Fields=Fields(s)});return s;}
+ public static void Save(Settings s){using(var mutex=new System.Threading.Mutex(false,RuntimeIpc.Name("Settings.Write.v2"))){bool held=false;try{try{held=mutex.WaitOne(5000);}catch(System.Threading.AbandonedMutexException){held=true;}if(!held)throw new IOException("Settings are busy. Please try again.");Baseline before;var local=Fields(s);if(baselines.TryGetValue(s,out before)&&File.Exists(Config)){var latest=Json.Deserialize<Settings>(File.ReadAllText(Config));var disk=Fields(latest);foreach(var field in typeof(Settings).GetFields())if(local[field.Name]==before.Fields[field.Name]&&disk[field.Name]!=before.Fields[field.Name])field.SetValue(s,field.GetValue(latest));}Atomic(Config,Json.Serialize(s));baselines.Remove(s);baselines.Add(s,new Baseline{Fields=Fields(s)});}finally{if(held)mutex.ReleaseMutex();}}RuntimeIpc.NotifySaved();}
  public static void Atomic(string path,string text){Directory.CreateDirectory(Path.GetDirectoryName(path));File.WriteAllText(path+".tmp",text,System.Text.Encoding.UTF8);if(File.Exists(path))File.Replace(path+".tmp",path,path+".bak");else File.Move(path+".tmp",path);}
  public static void Log(Exception e){try{Directory.CreateDirectory(Root);File.AppendAllText(Path.Combine(Root,"error.log"),DateTime.Now.ToString("s")+" "+e+Environment.NewLine);}catch{}}
  public static void Startup(bool on){if(on){Directory.CreateDirectory(Path.GetDirectoryName(StartupRegistration.StableExe));if(!String.Equals(StartupRegistration.StableExe,System.Windows.Forms.Application.ExecutablePath,StringComparison.OrdinalIgnoreCase))File.Copy(System.Windows.Forms.Application.ExecutablePath,StartupRegistration.StableExe,true);}var result=StartupRegistration.Run(on?"enable":"disable");if(result.Enabled!=on)throw new Exception(L.T("Windows 启动项状态与请求不一致。"));}

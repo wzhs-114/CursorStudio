@@ -12,7 +12,7 @@ Cursor Studio **1.0.0** is a free, MIT-licensed **Windows 11 cursor manager** fo
 
 - **Automatic foreground sizing:** match an EXE by full path or process name. Full-path matches take priority. Rules resize the current theme; they do not assign a separate theme to each application.
 - **Multiple themes with remembered sizes:** import folders or ZIP archives, switch themes quickly, and adjust sizes in 15 steps from 32 to 256 pixels.
-- **Designed for lightweight background use:** hiding or minimizing releases the UI, preview images, thumbnails and shared UI font cache. The existing single collection runs after the UI has been released; reopening recreates the font cache. This trades some reopen work for more predictable cleanup without adding a periodic background task. Reopening prepares the complete first frame before showing it. Foreground events are used normally, with a one-second fallback only if the event hook fails. Memory use varies with themes, usage and Windows memory management.
+- **Separate background and manager processes:** only the tray and foreground application rules remain running after closing to tray or minimizing. Reopening starts a fresh manager from saved themes, rules, language and preview preferences. The background process never constructs the manager, preview or thumbnail controls. Memory use still varies with Windows and runtime activity.
 - **Native and transparent:** built with C#, WinForms and Windows APIs, without WebView2, third-party runtime libraries, DLL injection or a cursor overlay.
 - **Free and recoverable:** MIT source code, local settings, an original-cursor backup and a restore entry point are included.
 
@@ -20,13 +20,13 @@ Cursor Studio **1.0.0** is a free, MIT-licensed **Windows 11 cursor manager** fo
 
 Download the Windows ZIP from [Releases](https://github.com/wzhs-114/CursorStudio/releases), extract the entire archive, and run `CursorStudio.exe`. Administrator privileges are not required. The application defaults to English. Use the Interface language selector at the top right to switch between English and Simplified Chinese; your choice is saved.
 
-Use “导入当前系统指针” (Import current system cursors) to copy the configured cursor files into an independent theme, including ANI animations and the desktop size, without switching the current scheme. This captures Windows system cursor files, not game-rendered pointers.
+Use “Import current system cursors” to copy the configured cursor files into an independent theme, including ANI animations and the desktop size, without switching the current scheme. This captures Windows system cursor files, not game-rendered pointers.
 
 The public package starts with an empty theme library. Import CUR/ANI files that you have permission to use; no character artwork or third-party themes are bundled. Importing a theme does not execute its EXE, BAT or installation scripts.
 
 Select the actual game EXE in the application rules page, rather than its launcher. You can also pick a running application. Update full-path rules if the game moves. Optional sign-in startup uses a stable executable copy and the real user's Windows startup entry. Short-lived, non-elevated scheduled tasks handle startup registration/query and are removed afterward.
 
-In the application rules page, choose whether closing the window sends it to the tray or exits fully. The default is to keep running in the tray, independently of whether rules are enabled. Double-click the tray icon to reopen it. Direct exit stops application rules and restores the desktop size; sign-in startup remains a separate preference.
+In the application rules page, choose whether closing the window sends it to the tray or exits fully. The default is to keep running in the tray, independently of whether rules are enabled. Double-click the tray icon to start the manager again. Direct exit stops both processes and restores the desktop size; sign-in startup remains a separate preference. The same executable serves both roles, so seeing two processes while the manager is open is expected.
 
 ### Data and recovery
 
@@ -37,6 +37,8 @@ Use the in-app restore action or the included `恢复原指针.bat` (restore ori
 ### Build and verify
 
 On Windows, run `./Source/Build.ps1`, then `./Tools/Package.ps1`. The build uses the Windows .NET Framework 4.x C# compiler and needs no NuGet packages. Run `./Tests/Test.ps1` for an isolated self-test. The optional `-Integration` test temporarily applies generated geometric cursors and restores the previous state afterward. Packaging uses an explicit allowlist to keep local themes and personal test data out of public ZIPs.
+
+Run `./Tests/SplitProcess.ps1` to verify real process reopening, crash isolation, foreground rules, settings synchronization and idle resource use. It temporarily changes cursor size and restores the previous state afterward.
 
 ### Scope and licensing
 
@@ -94,7 +96,7 @@ Windows 11 鼠标指针主题与应用大小管理器。管理多套 CUR/ANI 指
 
 ### 后台内存与界面恢复
 
-收起或最小化会释放控件树、预览资源、主题缩略图和界面字体缓存；释放后执行原有的一次内存清理，再次打开时重建字体缓存。这会增加少量重建工作，不增加周期性后台任务。再次打开时先完成布局、样式与可见首帧准备，再完整呈现；临时绘制合成在首帧完成后撤销，不保留整窗截图或额外动画计时器。
+管理界面与后台在独立进程运行。关闭到托盘或最小化会结束界面进程，后台仅保留托盘和前台应用规则，不构建管理窗口、预览和缩略图。再次打开会从保存的主题、规则、语言及预览偏好重建完整界面；打开时出现两个进程是正常现象。选择直接退出则结束两者并恢复桌面大小。
 
 后台占用随主题、打开历史、Windows 内存回收和测量指标变化。某次任务管理器中的低工作集读数不等于固定的总内存需求；本项目不通过定时清空工作集来修饰读数。
 
@@ -129,6 +131,8 @@ Windows 11 鼠标指针主题与应用大小管理器。管理多套 CUR/ANI 指
 # 会临时应用测试指针，结束后恢复原状态：
 .\Tests\Test.ps1 -Integration
 ```
+
+可运行 `.\Tests\SplitProcess.ps1` 验证真实双进程开关、规则切换、异常隔离和资源占用；测试会临时改变指针大小并在结束后恢复。
 
 测试素材由程序绘制简单几何图形，不依赖任何人物主题。集成检查覆盖真实系统指针与动画、多个大小、规则匹配、备份恢复及隐藏／最小化后的界面生命周期。
 
