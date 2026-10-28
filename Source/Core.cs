@@ -24,6 +24,7 @@ public sealed class Settings {
  public List<Theme> Themes=new List<Theme>(); public List<Rule> Rules=new List<Rule>();
  public string ActiveId="";public bool RulesEnabled=false,AutoStart=false,Migrated=false,Initialized=false;
  public string Appearance="Performance";
+ public bool CloseToTray=true;
 }
 public sealed class RegValue {public string Name;public int Kind;public object Value;}
 public sealed class Snapshot {

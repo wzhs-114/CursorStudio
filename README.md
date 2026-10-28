@@ -20,11 +20,13 @@ Cursor Studio **1.0.0** is a free, MIT-licensed **Windows 11 cursor manager** fo
 
 Download the Windows ZIP from [Releases](https://github.com/wzhs-114/CursorStudio/releases), extract the entire archive, and run `CursorStudio.exe`. Administrator privileges are not required. The application UI is currently primarily Chinese; this English text documents its use and does not add an English UI.
 
+Use “导入当前系统指针” (Import current system cursors) to copy the configured cursor files into an independent theme, including ANI animations and the desktop size, without switching the current scheme. This captures Windows system cursor files, not game-rendered pointers.
+
 The public package starts with an empty theme library. Import CUR/ANI files that you have permission to use; no character artwork or third-party themes are bundled. Importing a theme does not execute its EXE, BAT or installation scripts.
 
 Select the actual game EXE in the application rules page, rather than its launcher. You can also pick a running application. Update full-path rules if the game moves. Optional sign-in startup uses a stable executable copy and the real user's Windows startup entry. Short-lived, non-elevated scheduled tasks handle startup registration/query and are removed afterward.
 
-With application rules enabled, closing the window sends it to the tray; double-click the tray icon to reopen it. Without rules enabled, closing exits. Use the tray menu to exit fully and restore the desktop size.
+In the application rules page, choose whether closing the window sends it to the tray or exits fully. The default is to keep running in the tray, independently of whether rules are enabled. Double-click the tray icon to reopen it. Direct exit stops application rules and restores the desktop size; sign-in startup remains a separate preference.
 
 ### Data and recovery
 
@@ -80,13 +82,15 @@ Windows 11 鼠标指针主题与应用大小管理器。管理多套 CUR/ANI 指
 
 从 [Releases](https://github.com/wzhs-114/CursorStudio/releases) 下载 Windows ZIP，完整解压后运行 `CursorStudio.exe`，无需管理员权限。
 
+点击“导入当前系统指针”，可将当前系统方案的指针文件（含 ANI 动画）和桌面大小保存为独立主题，导入时不切换当前方案；游戏自行绘制的指针不属于系统方案。
+
 公共版不内置人物或其他第三方主题。首次打开是空主题库，请选择自己有权使用的 CUR/ANI 文件夹或 ZIP 导入。导入时不执行主题包中的 EXE、BAT 或安装脚本。
 
 在“应用规则”页选择真正的游戏 EXE，而不是启动器；也可以从运行中的应用选取。游戏移动目录后请重新选择路径，或明确使用进程名匹配。
 
 “登录 Windows 后启动到托盘”注册真实用户启动项，并读取系统实际启用状态；可在任务管理器的启动应用里找到 CursorStudio。为避免从打包宿主启动时落入隔离注册表，注册／查询会使用无触发器的临时任务，完成后移除，不留下常驻计划任务，不请求管理员权限。
 
-开启应用规则后，关闭窗口会收进托盘；双击托盘图标重新打开。未开启规则时关闭窗口会退出。托盘菜单可彻底退出并恢复桌面大小。
+在“应用规则”页可选择关闭窗口后收进托盘或直接退出，默认收进托盘，独立于应用规则开关。双击托盘图标重新打开；直接退出会停止应用规则并恢复桌面大小。登录启动是独立设置。
 
 ### 后台内存与界面恢复
 
