@@ -12,7 +12,7 @@ Cursor Studio **1.0.0** is a free, MIT-licensed **Windows 11 cursor manager** fo
 
 - **Automatic foreground sizing:** match an EXE by full path or process name. Full-path matches take priority. Rules resize the current theme; they do not assign a separate theme to each application.
 - **Multiple themes with remembered sizes:** import folders or ZIP archives, switch themes quickly, and adjust sizes in 15 steps from 32 to 256 pixels.
-- **Designed for lightweight background use:** hiding or minimizing releases the UI, preview images and thumbnails. Reopening prepares the complete first frame before showing it. Foreground events are used normally, with a one-second fallback only if the event hook fails. Memory use varies with themes, usage and Windows memory management.
+- **Designed for lightweight background use:** hiding or minimizing releases the UI, preview images, thumbnails and shared UI font cache. The existing single collection runs after the UI has been released; reopening recreates the font cache. This trades some reopen work for more predictable cleanup without adding a periodic background task. Reopening prepares the complete first frame before showing it. Foreground events are used normally, with a one-second fallback only if the event hook fails. Memory use varies with themes, usage and Windows memory management.
 - **Native and transparent:** built with C#, WinForms and Windows APIs, without WebView2, third-party runtime libraries, DLL injection or a cursor overlay.
 - **Free and recoverable:** MIT source code, local settings, an original-cursor backup and a restore entry point are included.
 
@@ -94,7 +94,7 @@ Windows 11 鼠标指针主题与应用大小管理器。管理多套 CUR/ANI 指
 
 ### 后台内存与界面恢复
 
-收起或最小化会释放控件树、预览资源和主题缩略图。再次打开时先完成布局、样式与可见首帧准备，再完整呈现；临时绘制合成在首帧完成后撤销，不保留整窗截图或额外动画计时器。
+收起或最小化会释放控件树、预览资源、主题缩略图和界面字体缓存；释放后执行原有的一次内存清理，再次打开时重建字体缓存。这会增加少量重建工作，不增加周期性后台任务。再次打开时先完成布局、样式与可见首帧准备，再完整呈现；临时绘制合成在首帧完成后撤销，不保留整窗截图或额外动画计时器。
 
 后台占用随主题、打开历史、Windows 内存回收和测量指标变化。某次任务管理器中的低工作集读数不等于固定的总内存需求；本项目不通过定时清空工作集来修饰读数。
 

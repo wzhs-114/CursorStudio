@@ -57,7 +57,7 @@ public sealed class MainForm:Form {
  }
  void PrepareChildren(Control parent){if((parent==themePage&&selectedPage!=0)||(parent==rulePage&&selectedPage!=1))return;parent.PerformLayout();foreach(Control child in parent.Controls){IntPtr handle=child.Handle;PrepareChildren(child);}}
  void ClearUi(){uiReady=false;if(content!=null){Controls.Remove(content);content.Dispose();content=null;}foreach(var bitmap in thumbnails.Values)bitmap.Dispose();thumbnails.Clear();themes=null;themeTitle=sizeLabel=state=null;slider=null;roles=null;preview=null;rules=null;enabled=startup=null;themePage=rulePage=null;themeTab=ruleTab=null;}
- void ReleaseUi(){if(!uiReady||building||releasing)return;Guard(FlushSize);releasing=true;selectedRole=roles.SelectedIndex;EndPresentation();ClearUi();releasing=false;if(!cleanupQueued&&!quitting&&IsHandleCreated){cleanupQueued=true;BeginInvoke((Action)(()=>{cleanupQueued=false;if(!uiReady&&!IsDisposed)GC.Collect(2,GCCollectionMode.Forced,false);}));}}
+ void ReleaseUi(){if(!uiReady||building||releasing)return;Guard(FlushSize);releasing=true;selectedRole=roles.SelectedIndex;EndPresentation();ClearUi();releasing=false;if(!cleanupQueued&&!quitting&&IsHandleCreated){cleanupQueued=true;BeginInvoke((Action)(()=>{cleanupQueued=false;if(!uiReady&&!IsDisposed){Skin.ReleaseUiFonts();GC.Collect(2,GCCollectionMode.Forced,false);}}));}}
  // Composite child windows only during presentation. No bitmap or UI tree is
  // retained while hidden, and no timer is needed to finish the first frame.
  protected override CreateParams CreateParams {get{var value=base.CreateParams;if(presenting)value.ExStyle|=0x02000000;return value;}}

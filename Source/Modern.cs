@@ -11,6 +11,7 @@ public static class Skin {
  static Icon icon;
  static readonly System.Collections.Generic.Dictionary<string,Font> fonts=new System.Collections.Generic.Dictionary<string,Font>();
  public static Font TextFont(float size,bool bold){string key=size+":"+bold;Font f;if(!fonts.TryGetValue(key,out f)){f=new Font("Microsoft YaHei UI",size,bold?FontStyle.Bold:FontStyle.Regular);fonts[key]=f;}return f;}
+ public static void ReleaseUiFonts(){foreach(var font in fonts.Values)font.Dispose();fonts.Clear();}
  public static Icon AppIcon {get{if(icon==null)using(var stream=typeof(Skin).Assembly.GetManifestResourceStream("CursorStudio.App.ico"))icon=stream==null?Icon.ExtractAssociatedIcon(Application.ExecutablePath):new Icon(stream);return icon;}}
  [DllImport("dwmapi.dll")]static extern int DwmSetWindowAttribute(IntPtr hwnd,int attr,ref int value,int size);
  [StructLayout(LayoutKind.Sequential)]struct Margins {public int Left,Right,Top,Bottom;}
