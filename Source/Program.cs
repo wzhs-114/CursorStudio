@@ -6,8 +6,8 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Reflection;
 [assembly:AssemblyTitle("Cursor Studio Cursor Manager")]
-[assembly:AssemblyVersion("1.0.0.0")]
-[assembly:AssemblyFileVersion("1.0.0.0")]
+[assembly:AssemblyVersion("1.1.0.0")]
+[assembly:AssemblyFileVersion("1.1.0.0")]
 namespace CursorStudio {
 static class Program {
  internal static EventWaitHandle ShowEvent,QuitEvent,RestoreEvent;

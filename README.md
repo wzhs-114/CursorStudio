@@ -1,12 +1,12 @@
 # Cursor Studio
 
-**Public version: 1.0.0** · [English](#english) · [简体中文](#chinese)
+**Public version: 1.1.0** · [English](#english) · [简体中文](#chinese)
 
 <img src="Source/AppIcon.svg" width="72" alt="Cursor Studio pointer icon" />
 
 ## English
 
-Cursor Studio **1.0.0** is a free, MIT-licensed **Windows 11 cursor manager** for custom mouse pointers, CUR/ANI cursor themes and per-application cursor scaling. Import complete CUR/ANI themes, save a desktop size for each theme, and automatically apply a different size while a matching game or application is in the foreground. Switching away restores the theme's desktop size.
+Cursor Studio **1.1.0** is a free, MIT-licensed **Windows 11 cursor manager** for custom mouse pointers, CUR/ANI cursor themes and per-application cursor scaling. Import complete CUR/ANI themes, save a desktop size for each theme, and automatically apply a different size while a matching game or application is in the foreground. Switching away restores the theme's desktop size.
 
 ### Highlights
 

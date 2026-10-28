@@ -23,5 +23,5 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: CursorStudio-Windows11
-          path: dist/CursorStudio-1.0.0-Windows11.zip
+          path: dist/CursorStudio-1.1.0-Windows11.zip
           if-no-files-found: error
